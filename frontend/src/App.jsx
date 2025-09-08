@@ -13,33 +13,13 @@ function App() {
   const [error, setError] = useState(null);
 
   const handlePredict = async (formData) => {
+    setShowForm(false);
     setIsLoading(true);
     setError(null);
     setPrediction(null);
 
     try {
-      const payload = {
-        deposit_type: formData.deposit_type || "",
-        country: formData.country || "",
-        lead_time: Number(formData.lead_time) || 0,
-        adr: Number(formData.adr) || 0,
-        arrival_date_day_of_month: Number(formData.arrival_date_day_of_month) || 1,
-        total_of_special_requests: Number(formData.total_of_special_requests) || 0,
-        arrival_date_week_number: Number(formData.arrival_date_week_number) || 1,
-        total_stay: Number(formData.total_stay) || 1,
-        previous_cancellations: Number(formData.previous_cancellations) || 0,
-        previous_bookings_not_canceled: Number(formData.previous_bookings_not_canceled) || 0,
-        arrival_date_month: formData.arrival_date_month || "",
-        market_segment: formData.market_segment || "",
-        customer_type: formData.customer_type || "",
-        assigned_room_type: formData.assigned_room_type || "",
-        required_car_parking_spaces: Number(formData.required_car_parking_spaces) || 0,
-        meal: formData.meal || "",
-        booking_changes: Number(formData.booking_changes) || 0,
-        distribution_channel: formData.distribution_channel || "",
-        reserved_room_type: formData.reserved_room_type || "",
-        total_guests: Number(formData.total_guests) || 1
-      };
+      const payload = { /* ... your formData mapping ... */ };
 
       const response = await fetch("http://127.0.0.1:8000/api/predict/", {
         method: "POST",
@@ -51,11 +31,10 @@ function App() {
 
       const data = await response.json();
 
-      // ✅ Ensure safe defaults if backend doesn’t return probabilities
       setPrediction({
-        prediction: data.prediction || "Unknown",
-        probability_not_canceled: data.probability_not_canceled ?? null,
-        probability_canceled: data.probability_canceled ?? null,
+        prediction: Number(data.prediction),
+        probability_not_canceled: Number(data.probability_not_canceled),
+        probability_canceled: Number(data.probability_canceled),
       });
     } catch (err) {
       setError(err.message);
@@ -63,6 +42,9 @@ function App() {
       setIsLoading(false);
     }
   };
+
+  // ✅ Move console.log here
+  console.log("Current prediction state:", prediction);
 
   return (
     <>
@@ -77,7 +59,6 @@ function App() {
         isLoading={isLoading}
       />
 
-      console.log("Current prediction state:", prediction);
       {prediction && <PredictionResult prediction={prediction} />}
 
       {error && (
@@ -90,5 +71,6 @@ function App() {
     </>
   );
 }
+
 
 export default App;
